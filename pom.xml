@@ -1,0 +1,177 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.vertixico</groupId>
+  <artifactId>testProducer</artifactId>
+  <version>0.9.0-SNAPSHOT</version>
+  <name>Test Producer</name>
+   
+  <properties>
+		<dropwizard.version>1.1.0</dropwizard.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.dropwizard</groupId>
+				<artifactId>dropwizard-bom</artifactId>
+				<version>${dropwizard.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<dependencies>
+		<dependency>
+			<groupId>de.fundstech.microservices.tools</groupId>
+			<artifactId>dwtools-auth</artifactId>
+			<version>${dropwizard.version}-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>de.fundstech.dropwizard.jdbi</groupId>
+			<artifactId>dwtools-jdbi</artifactId>
+			<version>${dropwizard.version}-SNAPSHOT</version>
+		</dependency>
+			<dependency>
+			<groupId>io.dropwizard</groupId>
+			<artifactId>dropwizard-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.el</groupId>
+    				<artifactId>javax.el-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard</groupId>
+			<artifactId>dropwizard-lifecycle</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>io.dropwizard</groupId>
+		    <artifactId>dropwizard-jersey</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.glassfish.jersey.ext</groupId>
+    				<artifactId>jersey-bean-validation</artifactId>    
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard</groupId>
+			<artifactId>dropwizard-migrations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.38</version>
+		</dependency>
+		<!-- GCloud mysql connection support -->
+		<dependency>
+    			<groupId>com.google.cloud.sql</groupId>
+    			<artifactId>mysql-socket-factory</artifactId>
+    			<version>1.0.2</version>
+		</dependency>
+		
+		
+		<dependency>
+            <groupId>com.kjetland.dropwizard</groupId>
+            <artifactId>dropwizard-activemq</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+        
+		<dependency>
+		    <groupId>com.h2database</groupId>
+		    <artifactId>h2</artifactId>
+		    <version>1.4.193</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>de.fundstech.microservice.mitarbeiter.MitarbeiterService</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>fabric8-maven-plugin</artifactId>
+				<version>3.2.8</version>
+				<configuration>
+					<images>
+						<image>
+							<alias>${project.artifactId}</alias>
+							<name>eu.gcr.io/nfcloud-147006/${docker.repository.name}/%a:${project.version}</name>
+							<build>
+								<from>openjdk:8-jre-alpine</from>
+								<maintainer>mdehning</maintainer>
+								<assembly>
+									<descriptor>docker-assembly.xml</descriptor>
+								</assembly>
+								<ports>
+									<port>8080</port>
+									<port>8081</port>
+								</ports>
+								<env></env>
+								<cmd>
+									<shell>java ${JAVA_OPTS} -Djavax.net.ssl.keyStore=/trust/keystore \
+										-Djavax.net.ssl.keyStorePassword=changeit \
+										-Djavax.net.ssl.trustStore=/trust/truststore \
+										-Djavax.net.ssl.trustStorePassword=changeit \
+										-jar /maven/${project.build.finalName}.jar \
+										server /maven/dropwizard.yml </shell>
+								</cmd>
+							</build>
+							<run>
+								<!-- later more -->
+							</run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,55 @@
+#database:
+#  #driverClass: com.mysql.jdbc.Driver
+#  driverClass: ${DB_DRV}
+#  user: ${DB_USER}
+#  password: ${DB_PW}
+#  url: ${DB_URL}
+#  properties:
+#    charSet: UTF-8
+#  maxWaitForConnection: 2s
+#  validationQuery: "/* MitarbeiterService healthCheck */ SELECT 1"
+#  validationQueryTimeout: 3s
+#  # the minimum number of connections to keep open
+#  minSize: 1
+#  # the maximum number of connections to keep open
+#  maxSize: 10
+#  # whether or not idle connection should be validated
+#  checkConnectionWhileIdle: true
+#  # the amount of time to sleep between runs of the idle connection validation, abandonned cleaner and idl pool resizing
+#  evictionInterval: 300s
+#  # the minimum amount of time a connection must sit idle in the pool, before it is eligible for eviction
+#  minIdleTime: 1 minute
+
+server:
+  applicationContextPath: /producer/
+  rootPath: /api
+  applicationConnectors:
+  - type: http
+    port: 8090
+  adminConnectors:
+  - type: http
+    port: 8091
+  requestLog:
+    appenders: []
+
+logging:
+  # the default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE or ALL
+  level: INFO
+
+#swagger:
+#  resourcePackage: de.fundstech.microservice.mitarbeiter.resource
+#  # delete schemes for automatic resolving
+#  schemes: []
+#  swaggerViewConfiguration:
+#    showApiSelector: false
+#    showAuth: false
+
+loginServiceClientConfiguration:
+  #loginServiceUrl: ${LOGINSERVICE_URL}
+  loginServiceUrl: https://demo.fundsware.de/services/login/api/v1
+  
+activeMQ:
+  brokerUrl: tcp://localhost:8095
+  #brokerUsername: Oa4q3YvbR0mRKqNam9grfnxkJnrn9rnuRMJEnP5O42vJkjLbjo0RfXrMVgqJR5OYcBWbCuEUzfal1XaUplkwzLaIsECCw2Zb9rKcjuX661AJoZxJT4U9lk6oGmn6sJMV
+
+queueName: producer
