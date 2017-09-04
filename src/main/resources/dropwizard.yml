@@ -49,7 +49,7 @@ loginServiceClientConfiguration:
   loginServiceUrl: https://demo.fundsware.de/services/login/api/v1
   
 activeMQ:
-  brokerUrl: tcp://localhost:8095
+  brokerUrl: tcp://0.0.0.0:61616
   #brokerUsername: Oa4q3YvbR0mRKqNam9grfnxkJnrn9rnuRMJEnP5O42vJkjLbjo0RfXrMVgqJR5OYcBWbCuEUzfal1XaUplkwzLaIsECCw2Zb9rKcjuX661AJoZxJT4U9lk6oGmn6sJMV
 
 queueName: producer
