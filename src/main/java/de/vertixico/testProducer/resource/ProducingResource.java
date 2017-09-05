@@ -14,12 +14,16 @@ import org.slf4j.LoggerFactory;
 import com.kjetland.dropwizard.activemq.ActiveMQReceiver;
 import com.kjetland.dropwizard.activemq.ActiveMQSender;
 
+import de.vertixico.testProducer.dao.Apple;
+import de.vertixico.testProducer.dao.Birne;
+
 @Path("/v1/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProducingResource {
 	
 	private ActiveMQSender activeMQSender;
+	private static int appleCount = 0;
 	
 	public ProducingResource(ActiveMQSender activeMQSender){
 		this.activeMQSender = activeMQSender;
@@ -34,4 +38,23 @@ public class ProducingResource {
 		return Response.ok().build();
 	}
 	
+	@GET
+	@Path("produce/apple")
+	public Response doProduceApple(){
+		LOG.info(String.format("Producing apple No %s!", ++appleCount));
+		
+		activeMQSender.send(new Apple("Vertis Apfel Nr. "+appleCount, "mega rot", Apple.Sorte.lecker));
+		
+		return Response.ok().build();
+	}
+	
+	@GET
+	@Path("produce/birne")
+	public Response doProduceBirne(){
+		LOG.info("Producing a pear!");
+		
+		activeMQSender.send(new Birne("Vertis Birne", true, 9001));
+		
+		return Response.ok().build();
+	}
 }
